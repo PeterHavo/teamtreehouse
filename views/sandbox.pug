@@ -1,0 +1,18 @@
+doctype html
+html(lang="en")
+  head
+    title table 
+  body
+    header 
+      h1 Table
+    section#content
+        table
+            th Name
+            th Department
+             each f in friends
+                tr
+                 td= f.name
+                 td= f.dep
+    footer
+      p app help you study 
+    
