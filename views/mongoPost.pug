@@ -1,0 +1,13 @@
+doctype html
+head
+	title Post request
+body
+	h2 this is Post request pug template Using Express
+	form(action='/postfruit', method='post')
+		label what is your favorite food
+			p please pick up one 
+			for fruit in fruits
+				p #{fruit.name}
+					input(type='radio', name='fruit', value=fruit)
+				p 
+		input(type='submit', value='Submit')

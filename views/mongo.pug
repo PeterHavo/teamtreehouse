@@ -1,0 +1,12 @@
+extends layout.pug
+
+block content
+    table
+        th Name
+        th Description
+        each f in docs
+         tr
+          td= f.name
+          td= f.desc
+
+

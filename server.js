@@ -1,11 +1,12 @@
 
-require(' @std/esm');
+
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const port = 3001;
 const friends = require('./sandbox/friends');
+const MongoClient = require('mongodb').MongoClient;
 
 
 //use body parser in our app
@@ -44,33 +45,42 @@ app.use( (req, res, next) => {
 
 //import routes
 
-const mainRoutes = require('./routes/index');
-const cardRoutes = require('./routes/cards');
-app.use(mainRoutes);
+MongoClient.connect('mongodb://localhost:27017/movies', (err, db) => {
+    console.log('connected to DB');
+    app.get('/mongo', (req, res) => {
+        db.collection('movies').find({}).toArray((err, docs) => {
+            if(err){
+                console.log(err);
+            }
+            res.render('mongo',{docs:docs});
+        });
+    });
 
-//partion routes
+    app.get('/mongo/:id', (req, res) => {
+        var name = req.params.id;
+        var getvar1 = req.query.getvar1;
+        var getvar2 = req.query.getvar2;
 
-app.use(mainRoutes);
-app.use('/cards', cardRoutes);
+        res.render('mongoParams', {name, getvar1, getvar2});
+    });
 
+    app.get('/mongopost', (req, res) => {
+       res.render('mongoPost', {fruits:[{name:'apple'},{name:'orange'}]}) 
+    });
 
+    app.post('/postfruit', (req, res) => {
+        var fruit = req.body.fruit;
+        db.collection('movies').insert({fruit}, (err, doc) => {
+            if (err){
+                console.log(`res.status 400 ${err}`)
+            }
+            res.json(doc);
+        })
 
-
-app.use((req, res, next) => {
-    const err = new Error(`Page Not Found on Peters Server`);
-    err.status = 404;
-    next(err);
+        
+    })
 });
 
-//handling errros last in stack
-
-app.use((err, req, res, next) => {
-    res.locals.error = err;
-    // res.status(500); //error code on server
-    // res.render('error', err); 
-    res.status(err.status)
-    res.render('error');   
-})
 
 app.listen(port, () => {
     console.log(`app is up and runnig on port ${port}`)
